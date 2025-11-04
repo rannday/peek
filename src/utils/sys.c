@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200112L
 
-// Ensure modern Windows APIs (Win7+) are exposed for CPU queries
+// modern Windows APIs (Win7+)
 #if defined(_WIN32) && !defined(_WIN32_WINNT)
   #define _WIN32_WINNT 0x0601
 #endif
@@ -126,11 +126,16 @@ unsigned detect_physical_cpus(void) {
 #elif defined(_WIN32)
   // Count physical cores via GetLogicalProcessorInformationEx
   typedef BOOL (WINAPI *PFN_GetLogicalProcessorInformationEx)(
-      LOGICAL_PROCESSOR_RELATIONSHIP, PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX, PDWORD);
+      LOGICAL_PROCESSOR_RELATIONSHIP,
+      PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX,
+      PDWORD);
 
   HMODULE k32 = GetModuleHandleA("kernel32.dll");
-  PFN_GetLogicalProcessorInformationEx pGLPIE =
-      (PFN_GetLogicalProcessorInformationEx)GetProcAddress(k32, "GetLogicalProcessorInformationEx");
+  PFN_GetLogicalProcessorInformationEx pGLPIE = NULL;
+  {
+    FARPROC p = GetProcAddress(k32, "GetLogicalProcessorInformationEx");
+    pGLPIE = (PFN_GetLogicalProcessorInformationEx)(void*)p; // safe cast across calling conv
+  }
 
   if (!pGLPIE) {
     // Fallback: approximate from logical CPUs (hyperthreading typical)
@@ -180,8 +185,11 @@ unsigned detect_logical_cpus(void) {
   // Group-aware logical CPU count
   typedef DWORD (WINAPI *PFN_GetActiveProcessorCount)(WORD);
   HMODULE k32 = GetModuleHandleA("kernel32.dll");
-  PFN_GetActiveProcessorCount pGetActiveProcessorCount =
-      (PFN_GetActiveProcessorCount)GetProcAddress(k32, "GetActiveProcessorCount");
+  PFN_GetActiveProcessorCount pGetActiveProcessorCount = NULL;
+  {
+    FARPROC p = GetProcAddress(k32, "GetActiveProcessorCount");
+    pGetActiveProcessorCount = (PFN_GetActiveProcessorCount)(void*)p; // safe cast
+  }
 
   if (pGetActiveProcessorCount) {
     DWORD n = pGetActiveProcessorCount(ALL_PROCESSOR_GROUPS);

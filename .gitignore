@@ -32,3 +32,17 @@ Thumbs.db
 
 # CLion / JetBrains
 .idea/
+
+# Zig
+zig-cache/
+zig-out/
+*.zig.zon
+
+# Windows/COFF build artifacts
+*.pdb
+*.obj
+*.ilk
+*.lib
+*.exp
+*.dll
+*.exe

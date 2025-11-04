@@ -1,0 +1,34 @@
+# Compiled objects
+*.o
+*.obj
+
+# Executables
+*.out
+*.exe
+peek
+
+# Libraries
+*.a
+*.so
+*.dll
+*.dylib
+
+# Build artifacts
+*.log
+*.tmp
+*.bak
+
+# Dependency/build directories
+build/
+dist/
+
+# Editor/system files
+*.swp
+*.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# CLion / JetBrains
+.idea/
